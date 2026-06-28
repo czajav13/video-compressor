@@ -1,0 +1,59 @@
+name: Build desktop apps
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: VideoCompressor-linux
+            command: python build.py
+            path: dist/VideoCompressor
+          - os: windows-latest
+            artifact: VideoCompressor-windows
+            command: python build.py
+            path: dist/VideoCompressor
+          - os: macos-latest
+            artifact: VideoCompressor-macos
+            command: python build.py
+            path: dist/VideoCompressor.app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Install ffmpeg on Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install ffmpeg on Windows
+        if: runner.os == 'Windows'
+        run: choco install ffmpeg -y
+
+      - name: Install ffmpeg on macOS
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+
+      - name: Build
+        run: ${{ matrix.command }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.path }}
