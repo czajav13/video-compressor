@@ -54,8 +54,23 @@ pip install -r requirements.txt
 python build.py
 ```
 
+Na Linux/Windows `build.py` tworzy pojedynczy plik:
+
+- Linux: `dist/VideoCompressor`
+- Windows: `dist/VideoCompressor.exe`
+
+Na macOS tworzy natywny bundle:
+
+- macOS: `dist/VideoCompressor.app`
+
 `build.py` automatycznie bundluje `ffmpeg` i `ffprobe`, jesli znajdzie je w `PATH`.
 Mozesz tez dodac folder recznie jako dane aplikacji.
+
+AppImage na Linuksie:
+
+```bash
+python build_appimage.py
+```
 
 Linux/macOS:
 

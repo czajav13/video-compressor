@@ -16,12 +16,12 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact: VideoCompressor-linux
-            command: python build.py
-            path: dist/VideoCompressor
+            command: python build_appimage.py
+            path: VideoCompressor-x86_64.AppImage
           - os: windows-latest
             artifact: VideoCompressor-windows
             command: python build.py
-            path: dist/VideoCompressor
+            path: dist/VideoCompressor.exe
           - os: macos-latest
             artifact: VideoCompressor-macos
             command: python build.py
@@ -40,6 +40,12 @@ jobs:
       - name: Install ffmpeg on Linux
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install appimagetool on Linux
+        if: runner.os == 'Linux'
+        run: |
+          curl -L -o /tmp/appimagetool-x86_64.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x /tmp/appimagetool-x86_64.AppImage
 
       - name: Install ffmpeg on Windows
         if: runner.os == 'Windows'
