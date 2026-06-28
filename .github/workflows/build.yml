@@ -16,7 +16,7 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact: VideoCompressor-linux
-            command: python build_appimage.py
+            command: python build.py && python build_appimage.py
             path: VideoCompressor-x86_64.AppImage
           - os: windows-latest
             artifact: VideoCompressor-windows
@@ -54,6 +54,11 @@ jobs:
       - name: Install ffmpeg on macOS
         if: runner.os == 'macOS'
         run: brew install ffmpeg
+
+      - name: Show checked out files
+        run: |
+          pwd
+          find . -maxdepth 2 -type f | sort
 
       - name: Build
         run: ${{ matrix.command }}
