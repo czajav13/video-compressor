@@ -22,7 +22,7 @@ jobs:
             path: dist/VideoCompressor.exe
           - os: macos-latest
             artifact: VideoCompressor-macos
-            path: dist/VideoCompressor.app
+            path: VideoCompressor-macos.zip
 
     steps:
       - uses: actions/checkout@v4
@@ -120,6 +120,10 @@ jobs:
       - name: Build macOS
         if: runner.os == 'macOS'
         run: python build.py
+
+      - name: Package macOS app
+        if: runner.os == 'macOS'
+        run: ditto -c -k --keepParent dist/VideoCompressor.app VideoCompressor-macos.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
