@@ -158,13 +158,13 @@ class CompressionWorker(QObject):
             if self.cancel_requested:
                 break
 
-            self.status.emit(f"Kompresja {index}/{total}: {item.input_path.name}")
+            self.status.emit(f"Compressing {index}/{total}: {item.input_path.name}")
             duration = self.probe_duration(item.input_path)
             result = self.compress_one(item, duration, index, total)
             if result != 0:
                 if self.cancel_requested:
                     break
-                self.error.emit(f"ffmpeg zakonczyl prace z kodem {result}: {item.input_path.name}")
+                self.error.emit(f"ffmpeg exited with code {result}: {item.input_path.name}")
                 return
 
             completed += 1
@@ -172,9 +172,9 @@ class CompressionWorker(QObject):
             self.total_progress.emit(completed / total * 100)
 
         if self.cancel_requested:
-            self.finished.emit(f"Anulowano. Ukonczono {completed}/{total}.")
+            self.finished.emit(f"Canceled. Completed {completed}/{total}.")
         else:
-            self.finished.emit(f"Gotowe. Skompresowano {completed}/{total} plikow.")
+            self.finished.emit(f"Done. Compressed {completed}/{total} files.")
 
     def probe_duration(self, input_path: Path) -> float | None:
         if not self.ffprobe_path:
@@ -224,7 +224,7 @@ class CompressionWorker(QObject):
                 universal_newlines=True,
             )
         except OSError as exc:
-            self.error.emit(f"Nie mozna uruchomic ffmpeg: {exc}")
+            self.error.emit(f"Could not start ffmpeg: {exc}")
             return 1
 
         assert self.process.stderr is not None
@@ -263,8 +263,8 @@ class MainWindow(QMainWindow):
 
     def initial_status(self) -> str:
         if self.ffmpeg_path:
-            return "Gotowe. Dodaj pliki MP4 albo folder."
-        return "Nie znaleziono ffmpeg. Dodaj ffmpeg do PATH albo do folderu aplikacji."
+            return "Ready. Add MP4 files or a folder."
+        return "ffmpeg was not found. Add ffmpeg to PATH or to the application folder."
 
     def create_widgets(self) -> None:
         root = QWidget()
@@ -274,15 +274,15 @@ class MainWindow(QMainWindow):
         toolbar = QHBoxLayout()
         layout.addLayout(toolbar)
 
-        self.add_files_button = QPushButton("Dodaj pliki")
+        self.add_files_button = QPushButton("Add files")
         self.add_files_button.clicked.connect(self.add_files)
         toolbar.addWidget(self.add_files_button)
 
-        self.add_folder_button = QPushButton("Dodaj folder")
+        self.add_folder_button = QPushButton("Add folder")
         self.add_folder_button.clicked.connect(self.add_folder)
         toolbar.addWidget(self.add_folder_button)
 
-        self.clear_button = QPushButton("Wyczysc")
+        self.clear_button = QPushButton("Clear")
         self.clear_button.clicked.connect(self.clear_files)
         toolbar.addWidget(self.clear_button)
 
@@ -292,7 +292,7 @@ class MainWindow(QMainWindow):
         self.start_button.clicked.connect(self.start_compression)
         toolbar.addWidget(self.start_button)
 
-        self.cancel_button = QPushButton("Anuluj")
+        self.cancel_button = QPushButton("Cancel")
         self.cancel_button.clicked.connect(self.cancel_compression)
         toolbar.addWidget(self.cancel_button)
 
@@ -300,7 +300,7 @@ class MainWindow(QMainWindow):
         layout.addLayout(content, 1)
 
         self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(["Plik", "Rozmiar", "Sciezka"])
+        self.table.setHorizontalHeaderLabels(["File", "Size", "Path"])
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -340,7 +340,7 @@ class MainWindow(QMainWindow):
         output_row.addWidget(output_button)
         settings_form.addRow("Output", output_row)
 
-        hint = QLabel("Domyslnie: libx264, CRF 30, veryfast, AAC 96k.")
+        hint = QLabel("Default: libx264, CRF 30, veryfast, AAC 96k.")
         hint.setWordWrap(True)
         settings_layout.addWidget(hint)
         settings_layout.addStretch(1)
@@ -351,12 +351,12 @@ class MainWindow(QMainWindow):
 
         self.current_progress = QProgressBar()
         self.current_progress.setRange(0, 100)
-        layout.addWidget(QLabel("Biezacy plik"))
+        layout.addWidget(QLabel("Current file"))
         layout.addWidget(self.current_progress)
 
         self.total_progress = QProgressBar()
         self.total_progress.setRange(0, 100)
-        layout.addWidget(QLabel("Cala kolejka"))
+        layout.addWidget(QLabel("Full queue"))
         layout.addWidget(self.total_progress)
 
     def set_status(self, text: str) -> None:
@@ -370,11 +370,11 @@ class MainWindow(QMainWindow):
         self.clear_button.setEnabled(not running)
 
     def add_files(self) -> None:
-        paths, _ = QFileDialog.getOpenFileNames(self, "Wybierz pliki MP4", "", "MP4 video (*.mp4);;Wszystkie pliki (*)")
+        paths, _ = QFileDialog.getOpenFileNames(self, "Select MP4 files", "", "MP4 video (*.mp4);;All files (*)")
         self.add_paths([Path(path) for path in paths])
 
     def add_folder(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Wybierz folder z MP4")
+        folder = QFileDialog.getExistingDirectory(self, "Select a folder with MP4 files")
         if folder:
             self.add_paths(sorted(Path(folder).glob("*.mp4")))
 
@@ -399,7 +399,7 @@ class MainWindow(QMainWindow):
             added += 1
 
         if added:
-            self.set_status(f"Dodano pliki: {added}. W kolejce: {len(self.files)}.")
+            self.set_status(f"Added files: {added}. In queue: {len(self.files)}.")
 
     def clear_files(self) -> None:
         self.files.clear()
@@ -409,7 +409,7 @@ class MainWindow(QMainWindow):
         self.set_status(self.initial_status())
 
     def choose_output_dir(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Wybierz folder wyjsciowy")
+        folder = QFileDialog.getExistingDirectory(self, "Select output folder")
         if folder:
             self.output_input.setText(folder)
 
@@ -425,13 +425,13 @@ class MainWindow(QMainWindow):
         if not self.ffmpeg_path:
             QMessageBox.critical(
                 self,
-                "Brak ffmpeg",
-                "Nie znaleziono ffmpeg. Zainstaluj ffmpeg w systemie albo dodaj binarke do folderu aplikacji.",
+                "Missing ffmpeg",
+                "ffmpeg was not found. Install ffmpeg on your system or add the binary to the application folder.",
             )
             return
 
         if not self.files:
-            QMessageBox.information(self, "Brak plikow", "Dodaj przynajmniej jeden plik MP4.")
+            QMessageBox.information(self, "No files", "Add at least one MP4 file.")
             return
 
         settings = self.read_settings()
@@ -459,12 +459,12 @@ class MainWindow(QMainWindow):
     def cancel_compression(self) -> None:
         if self.worker:
             self.worker.cancel()
-            self.set_status("Anulowanie...")
+            self.set_status("Canceling...")
 
     def handle_error(self, message: str) -> None:
         self.set_running(False)
         self.set_status(message)
-        QMessageBox.critical(self, "Blad kompresji", message)
+        QMessageBox.critical(self, "Compression error", message)
         if self.thread:
             self.thread.quit()
 

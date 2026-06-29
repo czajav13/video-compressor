@@ -1,36 +1,36 @@
 # Video Compressor
 
-Prosta aplikacja GUI do batchowej kompresji plikow MP4 przez `ffmpeg`.
-Domyslne ustawienia odpowiadaja `skrypt.sh`:
+A simple GUI application for batch-compressing MP4 files with `ffmpeg`.
+The default settings match `skrypt.sh`:
 
 ```bash
 ffmpeg -y -i input.mp4 -c:v libx264 -crf 30 -preset veryfast -c:a aac -b:a 96k output.mp4
 ```
 
-## Uruchomienie developerskie
+## Development Run
 
-Wymagania:
+Requirements:
 
 - Python 3.10+
-- zaleznosci z `requirements.txt`
-- `ffmpeg` i najlepiej `ffprobe` w `PATH`
+- dependencies from `requirements.txt`
+- `ffmpeg`, and preferably `ffprobe`, available in `PATH`
 
 ```bash
 python -m pip install -r requirements.txt
 python main.py
 ```
 
-## Bundlowanie ffmpeg
+## Bundling ffmpeg
 
-Aplikacja szuka binarek w tej kolejnosci:
+The application looks for binaries in this order:
 
-1. `ffmpeg/<platforma>/ffmpeg`
+1. `ffmpeg/<platform>/ffmpeg`
 2. `bin/ffmpeg`
-3. systemowy `PATH`
+3. system `PATH`
 
-Na Windows nazwa binarki to `ffmpeg.exe`.
+On Windows, the binary name is `ffmpeg.exe`.
 
-Przykladowa struktura:
+Example structure:
 
 ```text
 ffmpeg/
@@ -45,28 +45,28 @@ ffmpeg/
     ffprobe
 ```
 
-## Build aplikacji
+## Application Build
 
-Najprostsza sciezka to PyInstaller:
+The simplest path is PyInstaller:
 
 ```bash
 pip install -r requirements.txt
 python build.py
 ```
 
-Na Linux/Windows `build.py` tworzy pojedynczy plik:
+On Linux and Windows, `build.py` creates a single file:
 
 - Linux: `dist/VideoCompressor`
 - Windows: `dist/VideoCompressor.exe`
 
-Na macOS tworzy natywny bundle:
+On macOS, it creates a native bundle:
 
 - macOS: `dist/VideoCompressor.app`
 
-`build.py` automatycznie bundluje `ffmpeg` i `ffprobe`, jesli znajdzie je w `PATH`.
-Mozesz tez dodac folder recznie jako dane aplikacji.
+`build.py` automatically bundles `ffmpeg` and `ffprobe` if it finds them in `PATH`.
+You can also add the folder manually as application data.
 
-AppImage na Linuksie:
+AppImage on Linux:
 
 ```bash
 python build_appimage.py
@@ -84,14 +84,14 @@ Windows:
 pyinstaller --noconfirm --windowed --name VideoCompressor --add-data "ffmpeg;ffmpeg" main.py
 ```
 
-Wynik znajdziesz w `dist/VideoCompressor`.
+The output is available in `dist/VideoCompressor`.
 
-## Build Windows/macOS/Linux w CI
+## Windows/macOS/Linux Build in CI
 
-Workflow `.github/workflows/build.yml` buduje artefakty na natywnych runnerach:
+The `.github/workflows/build.yml` workflow builds artifacts on native runners:
 
-- Linux na `ubuntu-latest`
-- Windows na `windows-latest`
-- macOS na `macos-latest`
+- Linux on `ubuntu-latest`
+- Windows on `windows-latest`
+- macOS on `macos-latest`
 
-To jest w praktyce najpewniejsza metoda, bo PyInstaller nie robi pelnego cross-builda macOS/Windows z Linuksa.
+In practice, this is the most reliable method because PyInstaller does not provide a full macOS/Windows cross-build from Linux.
