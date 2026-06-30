@@ -45,7 +45,7 @@ jobs:
                   print(path.as_posix())
           PY
 
-      - name: Install ffmpeg on Linux
+      - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ffmpeg libxcb-image0 libxcb-xkb1 libxkbcommon-x11-0
 
@@ -55,14 +55,6 @@ jobs:
         run: |
           curl -L -o /tmp/appimagetool-x86_64.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x /tmp/appimagetool-x86_64.AppImage
-
-      - name: Install ffmpeg on Windows
-        if: runner.os == 'Windows'
-        run: choco install ffmpeg -y
-
-      - name: Install ffmpeg on macOS
-        if: runner.os == 'macOS'
-        run: brew install ffmpeg
 
       - name: Build Linux binary
         if: runner.os == 'Linux'

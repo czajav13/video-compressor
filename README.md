@@ -13,7 +13,7 @@ Requirements:
 
 - Python 3.10+
 - dependencies from `requirements.txt`
-- `ffmpeg`, and preferably `ffprobe`, available in `PATH`
+- `ffmpeg`, and preferably `ffprobe`, available in `PATH` for development runs
 
 ```bash
 python -m pip install -r requirements.txt
@@ -63,8 +63,21 @@ On macOS, it creates a native bundle:
 
 - macOS: `dist/VideoCompressor.app`
 
-`build.py` automatically bundles `ffmpeg` and `ffprobe` if it finds them in `PATH`.
-You can also add the folder manually as application data.
+`build.py` bundles `ffmpeg` into the app. It first checks `FFMPEG_BIN_DIR`,
+then uses the portable binary from `imageio-ffmpeg`, and finally falls back to
+`PATH`. The build fails if no `ffmpeg` binary can be bundled.
+
+`ffprobe` is optional. If `FFMPEG_BIN_DIR` or `PATH` contains `ffprobe`, it is
+bundled too; otherwise the app falls back to parsing duration from `ffmpeg`
+output.
+
+To force a specific ffmpeg build:
+
+```bash
+FFMPEG_BIN_DIR=/path/to/ffmpeg/bin python build.py
+```
+
+On Windows, `FFMPEG_BIN_DIR` must point to the folder containing `ffmpeg.exe`.
 
 AppImage on Linux:
 
