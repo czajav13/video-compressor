@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { formatBytes } from "./format";
-import { qualityToCrf } from "./compression";
+import { normalizeCrf } from "./compression";
 
 describe("formatBytes", () => {
   it("formats byte counts", () => {
@@ -9,17 +9,15 @@ describe("formatBytes", () => {
   });
 });
 
-describe("qualityToCrf", () => {
-  it("lowers CRF as quality increases", () => {
-    const lowQuality = qualityToCrf(20);
-    const highQuality = qualityToCrf(80);
-
-    expect(highQuality).toBeLessThan(lowQuality);
+describe("normalizeCrf", () => {
+  it("keeps valid CRF values", () => {
+    expect(normalizeCrf(30)).toBe(30);
+    expect(normalizeCrf(18.4)).toBe(18);
   });
 
-  it("maps slider bounds to expected CRF bounds", () => {
-    expect(qualityToCrf(1)).toBe(36);
-    expect(qualityToCrf(55)).toBe(30);
-    expect(qualityToCrf(100)).toBe(18);
+  it("clamps CRF to ffmpeg bounds", () => {
+    expect(normalizeCrf(-2)).toBe(0);
+    expect(normalizeCrf(60)).toBe(51);
+    expect(normalizeCrf(Number.NaN)).toBe(30);
   });
 });

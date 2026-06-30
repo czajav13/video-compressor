@@ -72,13 +72,48 @@ app.innerHTML = `
       </label>
 
       <label class="field">
-        <span>Quality</span>
-        <input id="quality" type="range" min="1" max="100" value="55" />
-        <output id="quality-value">55</output>
+        <span class="label-row">
+          CRF
+          <button class="help-button" type="button" aria-label="CRF help" data-tooltip="Constant Rate Factor controls video quality. Lower values mean better quality and larger files. 18 is high quality, 23 is common, 30 is smaller.">?</button>
+        </span>
+        <input id="crf" type="number" min="0" max="51" step="1" value="30" />
       </label>
 
       <label class="field">
-        <span>Max width</span>
+        <span class="label-row">
+          Preset
+          <button class="help-button" type="button" aria-label="Preset help" data-tooltip="The x264 preset controls encoding speed versus compression efficiency. Faster presets finish sooner; slower presets may make smaller files at the same CRF.">?</button>
+        </span>
+        <select id="preset">
+          <option value="ultrafast">ultrafast</option>
+          <option value="superfast">superfast</option>
+          <option value="veryfast">veryfast</option>
+          <option value="faster">faster</option>
+          <option value="fast" selected>fast</option>
+          <option value="medium">medium</option>
+          <option value="slow">slow</option>
+          <option value="slower">slower</option>
+          <option value="veryslow">veryslow</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label-row">
+          Audio
+          <button class="help-button" type="button" aria-label="Audio help" data-tooltip="Keep original copies the source audio without changing quality. AAC 96k re-encodes audio for smaller files. No audio removes audio tracks.">?</button>
+        </span>
+        <select id="audio-mode">
+          <option value="copy" selected>Keep original</option>
+          <option value="aac96">AAC 96k</option>
+          <option value="none">No audio</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label-row">
+          Max width
+          <button class="help-button" type="button" aria-label="Max width help" data-tooltip="Limits output video width while preserving aspect ratio. Original keeps the source resolution.">?</button>
+        </span>
         <select id="max-width">
           <option value="0">Original</option>
           <option value="3840">3840 px</option>
@@ -116,8 +151,9 @@ app.innerHTML = `
 const statusEl = getElement<HTMLParagraphElement>("status");
 const queueEl = getElement<HTMLDivElement>("queue");
 const outputFolderEl = getElement<HTMLInputElement>("output-folder");
-const qualityEl = getElement<HTMLInputElement>("quality");
-const qualityValueEl = getElement<HTMLOutputElement>("quality-value");
+const crfEl = getElement<HTMLInputElement>("crf");
+const presetEl = getElement<HTMLSelectElement>("preset");
+const audioModeEl = getElement<HTMLSelectElement>("audio-mode");
 const maxWidthEl = getElement<HTMLSelectElement>("max-width");
 const currentProgressEl = getElement<HTMLProgressElement>("current-progress");
 const totalProgressEl = getElement<HTMLProgressElement>("total-progress");
@@ -175,10 +211,6 @@ getElement<HTMLButtonElement>("clear").addEventListener("click", () => {
   state.results = [];
   setProgress(0, 0);
   render();
-});
-
-qualityEl.addEventListener("input", () => {
-  qualityValueEl.value = qualityEl.value;
 });
 
 startButton.addEventListener("click", () => {
@@ -292,7 +324,9 @@ async function startCompression(): Promise<void> {
 
 function readSettings(): CompressionSettings {
   return {
-    quality: Number.parseInt(qualityEl.value, 10),
+    crf: Number.parseInt(crfEl.value, 10),
+    preset: presetEl.value as CompressionSettings["preset"],
+    audioMode: audioModeEl.value as CompressionSettings["audioMode"],
     maxWidth: Number.parseInt(maxWidthEl.value, 10),
   };
 }

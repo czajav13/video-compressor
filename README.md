@@ -9,8 +9,8 @@ in `PATH`.
 - Batch-add MP4 files or all MP4 files from a folder.
 - Pick one output folder for the whole queue.
 - Compress video to H.264 MP4 with `libx264`.
-- Re-encode audio to AAC 96k.
-- Simple quality slider mapped to ffmpeg CRF.
+- Explicit ffmpeg controls for CRF and x264 preset.
+- Keep original audio by default, with optional AAC 96k or no-audio modes.
 - Optional max-width scaling.
 - Track current-file and total progress.
 - Light and dark UI themes.

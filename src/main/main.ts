@@ -156,24 +156,32 @@ function ffmpegArgs(request: CompressionRequest, outputPath: string): string[] {
     "-c:v",
     "libx264",
     "-crf",
-    String(qualityToCrf(request.settings.quality)),
+    String(normalizeCrf(request.settings.crf)),
     "-preset",
-    "veryfast",
-    "-c:a",
-    "aac",
-    "-b:a",
-    "96k",
-    "-movflags",
-    "+faststart",
-    outputPath,
+    request.settings.preset,
   );
+
+  args.push(...audioArgs(request.settings.audioMode), "-movflags", "+faststart", outputPath);
 
   return args;
 }
 
-export function qualityToCrf(quality: number): number {
-  const clamped = Math.max(1, Math.min(100, quality));
-  return Math.round(18 + 18 * Math.sqrt((100 - clamped) / 99));
+export function normalizeCrf(crf: number): number {
+  if (!Number.isFinite(crf)) {
+    return 30;
+  }
+
+  return Math.max(0, Math.min(51, Math.round(crf)));
+}
+
+export function audioArgs(audioMode: CompressionRequest["settings"]["audioMode"]): string[] {
+  if (audioMode === "none") {
+    return ["-an"];
+  }
+  if (audioMode === "aac96") {
+    return ["-c:a", "aac", "-b:a", "96k"];
+  }
+  return ["-c:a", "copy"];
 }
 
 export function videoFilterArgs(maxWidth: number): string[] {

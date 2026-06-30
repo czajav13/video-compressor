@@ -5,7 +5,9 @@ export type VideoFile = {
 };
 
 export type CompressionSettings = {
-  quality: number;
+  crf: number;
+  preset: "ultrafast" | "superfast" | "veryfast" | "faster" | "fast" | "medium" | "slow" | "slower" | "veryslow";
+  audioMode: "copy" | "aac96" | "none";
   maxWidth: number;
 };
 

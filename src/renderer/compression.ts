@@ -20,9 +20,12 @@ export class CompressionCancelled extends Error {
   }
 }
 
-export function qualityToCrf(quality: number): number {
-  const clamped = Math.max(1, Math.min(100, quality));
-  return Math.round(18 + 18 * Math.sqrt((100 - clamped) / 99));
+export function normalizeCrf(crf: number): number {
+  if (!Number.isFinite(crf)) {
+    return 30;
+  }
+
+  return Math.max(0, Math.min(51, Math.round(crf)));
 }
 
 export async function compressVideoFile(options: {
