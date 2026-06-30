@@ -67,23 +67,14 @@ The GitHub Actions workflow builds native artifacts on:
 - `windows-latest` as installer and portable EXE
 - `macos-latest` as DMG and ZIP
 
-## macOS Signing
+## macOS Gatekeeper
 
-macOS downloads should be signed and notarized, otherwise Gatekeeper may block
-the app after download. The workflow passes standard Electron Builder signing
-secrets through to `npm run build`.
+The macOS build is ad-hoc signed, but it is not Apple-notarized. After download,
+Gatekeeper may still quarantine it. For local testing, remove quarantine:
 
-Required for Developer ID signing:
+```bash
+xattr -dr com.apple.quarantine "/Applications/Video Compressor.app"
+```
 
-- `CSC_LINK`: base64-encoded `.p12` Developer ID Application certificate or a
-  secure URL supported by Electron Builder
-- `CSC_KEY_PASSWORD`: password for the certificate
-
-Required for notarization, choose one method:
-
-- Apple ID method: `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`
-- App Store Connect API key method: `APPLE_API_KEY`, `APPLE_API_KEY_ID`,
-  `APPLE_API_ISSUER`
-
-Without these secrets the macOS artifact is useful for local testing, but users
-may need to bypass Gatekeeper manually.
+For public distribution without this manual step, a paid Apple Developer ID
+certificate and notarization are still required.
