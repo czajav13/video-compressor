@@ -66,3 +66,24 @@ The GitHub Actions workflow builds native artifacts on:
 - `ubuntu-latest` as AppImage
 - `windows-latest` as installer and portable EXE
 - `macos-latest` as DMG and ZIP
+
+## macOS Signing
+
+macOS downloads should be signed and notarized, otherwise Gatekeeper may block
+the app after download. The workflow passes standard Electron Builder signing
+secrets through to `npm run build`.
+
+Required for Developer ID signing:
+
+- `CSC_LINK`: base64-encoded `.p12` Developer ID Application certificate or a
+  secure URL supported by Electron Builder
+- `CSC_KEY_PASSWORD`: password for the certificate
+
+Required for notarization, choose one method:
+
+- Apple ID method: `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`
+- App Store Connect API key method: `APPLE_API_KEY`, `APPLE_API_KEY_ID`,
+  `APPLE_API_ISSUER`
+
+Without these secrets the macOS artifact is useful for local testing, but users
+may need to bypass Gatekeeper manually.

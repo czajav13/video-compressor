@@ -17,6 +17,7 @@
     "lint": "npm run typecheck"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.1.1",
     "@types/node": "^22.10.2",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
@@ -47,6 +48,7 @@
         ]
       }
     ],
+    "afterSign": "scripts/notarize.mjs",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -57,6 +59,10 @@
         "zip"
       ],
       "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "category": "public.app-category.video"
     },
     "win": {
