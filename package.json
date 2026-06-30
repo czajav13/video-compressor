@@ -1,0 +1,77 @@
+{
+  "name": "video-compressor",
+  "version": "1.0.0",
+  "description": "Cross-platform MP4 compressor built with Electron and bundled ffmpeg.",
+  "author": "Kuba",
+  "main": "dist-electron/main/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"npm:dev:electron\"",
+    "dev:electron": "wait-on http://127.0.0.1:5173 && npm run prepare:ffmpeg && npm run build:electron && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .",
+    "build": "npm run prepare:ffmpeg && npm run typecheck && vite build && npm run build:electron && electron-builder",
+    "build:dir": "npm run prepare:ffmpeg && npm run typecheck && vite build && npm run build:electron && electron-builder --dir",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "prepare:ffmpeg": "node scripts/prepare-ffmpeg.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.electron.json",
+    "test": "vitest run",
+    "lint": "npm run typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^42.5.1",
+    "electron-builder": "^26.15.3",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^4.1.9",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.kubap.video-compressor",
+    "productName": "Video Compressor",
+    "files": [
+      "dist-renderer/**/*",
+      "dist-electron/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/ffmpeg",
+        "to": "ffmpeg",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.video"
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": [
+        "AppImage"
+      ],
+      "category": "AudioVideo"
+    }
+  }
+}

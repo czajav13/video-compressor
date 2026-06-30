@@ -1,0 +1,285 @@
+:root {
+  color-scheme: light;
+  --app-bg: #f6f7f9;
+  --panel-bg: #ffffff;
+  --panel-soft: #f5f8ff;
+  --text: #1f2328;
+  --muted: #5c6675;
+  --label: #4d5665;
+  --border: #d9dee7;
+  --border-strong: #c8ced8;
+  --row-border: #edf0f4;
+  --done-bg: #f4fbf7;
+  --error-bg: #fff5f5;
+  --primary: #2563eb;
+  --primary-text: #ffffff;
+  --input-bg: #ffffff;
+  color: var(--text);
+  background: var(--app-bg);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --app-bg: #101419;
+  --panel-bg: #171c22;
+  --panel-soft: #162235;
+  --text: #e7edf5;
+  --muted: #9aa7b7;
+  --label: #c2ccda;
+  --border: #2a333f;
+  --border-strong: #3a4655;
+  --row-border: #242c36;
+  --done-bg: #13251e;
+  --error-bg: #2a171a;
+  --primary: #60a5fa;
+  --primary-text: #08111d;
+  --input-bg: #11161c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 900px;
+  min-height: 620px;
+  background: var(--app-bg);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--border-strong);
+  background: var(--panel-bg);
+  color: var(--text);
+  border-radius: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button.primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-text);
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  min-height: 100vh;
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+#status {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.actions,
+.folder-row {
+  display: flex;
+  gap: 8px;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.icon-button {
+  display: inline-grid;
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  place-items: center;
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.queue-head,
+.queue-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 120px minmax(220px, 320px);
+  gap: 16px;
+  align-items: center;
+}
+
+.queue-head {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.queue {
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+}
+
+.queue-row {
+  min-height: 58px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--row-border);
+}
+
+.queue-row:first-child {
+  border-top: 0;
+}
+
+.queue-row.done {
+  background: var(--done-bg);
+}
+
+.queue-row.error {
+  background: var(--error-bg);
+}
+
+.queue-row.running {
+  background: var(--panel-soft);
+}
+
+.file-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.row-status {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.row-status span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  padding: 28px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-left: 1px solid var(--border);
+  background: var(--panel-bg);
+  padding: 24px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field > span,
+.progress-label {
+  color: var(--label);
+  font-weight: 700;
+}
+
+input[type="text"],
+select {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+output {
+  color: var(--muted);
+}
+
+.progress-block {
+  display: grid;
+  gap: 8px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+progress {
+  width: 100%;
+  height: 8px;
+  accent-color: var(--primary);
+}
+
+.settings > button {
+  width: 100%;
+}
+
+.results {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  color: var(--label);
+  font-size: 12px;
+}
+
+.results p {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
