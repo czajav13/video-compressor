@@ -234,8 +234,8 @@ function waitForProcess(child: ChildProcessWithoutNullStreams): Promise<void> {
 function toolPath(name: "ffmpeg" | "ffprobe"): string {
   const executable = process.platform === "win32" ? `${name}.exe` : name;
   const baseDir = app.isPackaged
-    ? path.join(process.resourcesPath, "ffmpeg", platformName())
-    : path.join(__dirname, "../../build/ffmpeg", platformName());
+    ? path.join(process.resourcesPath, "ffmpeg", `${platformName()}-${archName()}`)
+    : path.join(__dirname, "../../build/ffmpeg", `${platformName()}-${archName()}`);
   return path.join(baseDir, executable);
 }
 
@@ -247,6 +247,13 @@ function platformName(): "win" | "mac" | "linux" {
     return "mac";
   }
   return "linux";
+}
+
+function archName(): string {
+  if (process.arch === "arm") {
+    return "arm";
+  }
+  return process.arch;
 }
 
 function compactFfmpegError(stderr: string, error: unknown): string {

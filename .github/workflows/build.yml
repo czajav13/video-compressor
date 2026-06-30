@@ -15,17 +15,58 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact: VideoCompressor-linux
+            platform: linux
+            arch: x64
+            npm_arch: x64
+            ffmpeg_dir: linux-x64
+            artifact: VideoCompressor-linux-x64
+            path: release/*.AppImage
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            npm_arch: arm64
+            ffmpeg_dir: linux-arm64
+            artifact: VideoCompressor-linux-arm64
+            path: release/*.AppImage
+          - os: ubuntu-latest
+            platform: linux
+            arch: armv7l
+            npm_arch: arm
+            ffmpeg_dir: linux-arm
+            artifact: VideoCompressor-linux-arm
             path: release/*.AppImage
           - os: windows-latest
-            artifact: VideoCompressor-windows
+            platform: windows
+            arch: x64
+            npm_arch: x64
+            ffmpeg_dir: win-x64
+            artifact: VideoCompressor-windows-x64
+            path: |
+              release/*.exe
+          - os: windows-latest
+            platform: windows
+            arch: ia32
+            npm_arch: ia32
+            ffmpeg_dir: win-ia32
+            artifact: VideoCompressor-windows-x86
             path: |
               release/*.exe
           - os: macos-latest
-            artifact: VideoCompressor-macos
+            platform: macos
+            arch: x64
+            npm_arch: x64
+            ffmpeg_dir: mac-x64
+            artifact: VideoCompressor-macos-x64
             path: |
               release/*.dmg
-              release/*.zip
+          - os: macos-latest
+            platform: macos
+            arch: arm64
+            npm_arch: arm64
+            ffmpeg_dir: mac-arm64
+            artifact: VideoCompressor-macos-arm64
+            path: |
+              release/*.dmg
 
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +79,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare architecture-specific ffmpeg packages
+        run: npm rebuild ffmpeg-static ffprobe-static
+        env:
+          npm_config_arch: ${{ matrix.npm_arch }}
+
       - name: Typecheck
         run: npm run lint
 
@@ -45,28 +91,30 @@ jobs:
         run: npm test
 
       - name: Build app
-        run: npm run build
+        run: npm run build -- --${{ matrix.arch }}
+        env:
+          npm_config_arch: ${{ matrix.npm_arch }}
 
       - name: Verify bundled ffmpeg on Linux
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          test -x release/linux-unpacked/resources/ffmpeg/linux/ffmpeg
-          test -x release/linux-unpacked/resources/ffmpeg/linux/ffprobe
+          find release -path "*/resources/ffmpeg/${{ matrix.ffmpeg_dir }}/ffmpeg" -perm -111 | grep .
+          find release -path "*/resources/ffmpeg/${{ matrix.ffmpeg_dir }}/ffprobe" -perm -111 | grep .
 
       - name: Verify bundled ffmpeg on macOS
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          test -x "release/mac-arm64/Video Compressor.app/Contents/Resources/ffmpeg/mac/ffmpeg" || test -x "release/mac/Video Compressor.app/Contents/Resources/ffmpeg/mac/ffmpeg"
-          test -x "release/mac-arm64/Video Compressor.app/Contents/Resources/ffmpeg/mac/ffprobe" || test -x "release/mac/Video Compressor.app/Contents/Resources/ffmpeg/mac/ffprobe"
+          find release -path "*/Contents/Resources/ffmpeg/${{ matrix.ffmpeg_dir }}/ffmpeg" -perm -111 | grep .
+          find release -path "*/Contents/Resources/ffmpeg/${{ matrix.ffmpeg_dir }}/ffprobe" -perm -111 | grep .
 
       - name: Verify bundled ffmpeg on Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $ffmpeg = Get-ChildItem -Path release -Recurse -Filter ffmpeg.exe | Where-Object { $_.FullName -match "\\resources\\ffmpeg\\win\\ffmpeg.exe$" } | Select-Object -First 1
-          $ffprobe = Get-ChildItem -Path release -Recurse -Filter ffprobe.exe | Where-Object { $_.FullName -match "\\resources\\ffmpeg\\win\\ffprobe.exe$" } | Select-Object -First 1
+          $ffmpeg = Get-ChildItem -Path release -Recurse -Filter ffmpeg.exe | Where-Object { $_.FullName -match "\\resources\\ffmpeg\\${{ matrix.ffmpeg_dir }}\\ffmpeg.exe$" } | Select-Object -First 1
+          $ffprobe = Get-ChildItem -Path release -Recurse -Filter ffprobe.exe | Where-Object { $_.FullName -match "\\resources\\ffmpeg\\${{ matrix.ffmpeg_dir }}\\ffprobe.exe$" } | Select-Object -First 1
           if (-not $ffmpeg) { throw "Bundled ffmpeg.exe not found" }
           if (-not $ffprobe) { throw "Bundled ffprobe.exe not found" }
 

@@ -63,9 +63,9 @@ On Windows the executable names include `.exe`.
 
 The GitHub Actions workflow builds native artifacts on:
 
-- `ubuntu-latest` as AppImage
-- `windows-latest` as installer and portable EXE
-- `macos-latest` as DMG and ZIP
+- Linux AppImage: `x64`, `arm64`, `arm`
+- Windows portable EXE: `x64`, `x86`
+- macOS DMG: `x64`, `arm64`
 
 ## macOS Gatekeeper
 

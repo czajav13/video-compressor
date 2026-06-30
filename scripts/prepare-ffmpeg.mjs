@@ -1,4 +1,4 @@
-import { chmod, copyFile, mkdir } from "node:fs/promises";
+import { chmod, copyFile, mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { createRequire } from "node:module";
 
@@ -13,9 +13,12 @@ if (!ffmpegPath || !ffprobePath) {
 }
 
 const platform = platformName();
+const arch = archName();
 const extension = process.platform === "win32" ? ".exe" : "";
-const targetDir = path.resolve("build", "ffmpeg", platform);
+const ffmpegBuildDir = path.resolve("build", "ffmpeg");
+const targetDir = path.resolve("build", "ffmpeg", `${platform}-${arch}`);
 
+await rm(ffmpegBuildDir, { recursive: true, force: true });
 await mkdir(targetDir, { recursive: true });
 await copyBinary(ffmpegPath, path.join(targetDir, `ffmpeg${extension}`));
 await copyBinary(ffprobePath, path.join(targetDir, `ffprobe${extension}`));
@@ -37,4 +40,12 @@ function platformName() {
     return "mac";
   }
   return "linux";
+}
+
+function archName() {
+  const arch = process.env.npm_config_arch || process.arch;
+  if (arch === "armv7l") {
+    return "arm";
+  }
+  return arch;
 }

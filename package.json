@@ -53,8 +53,7 @@
     },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ],
       "icon": "build/icon.icns",
       "identity": "-",
@@ -65,7 +64,6 @@
     "win": {
       "icon": "build/icon.ico",
       "target": [
-        "nsis",
         "portable"
       ]
     },
